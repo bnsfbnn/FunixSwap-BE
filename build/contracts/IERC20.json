@@ -194,7 +194,7 @@
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "// SPDX-License-Identifier: MIT\r\npragma solidity ^0.8.0;\r\n\r\ninterface IERC20 {\r\n\r\n    function totalSupply() external view returns (uint256);\r\n    function balanceOf(address account) external view returns (uint256);\r\n    function allowance(address owner, address spender) external view returns (uint256);\r\n\r\n    function transfer(address recipient, uint256 amount) external returns (bool);\r\n    function approve(address spender, uint256 amount) external returns (bool);\r\n    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);\r\n\r\n\r\n    event Transfer(address indexed from, address indexed to, uint256 value);\r\n    event Approval(address indexed owner, address indexed spender, uint256 value);\r\n}\r\n\r\ncontract BasicToken is IERC20 {\r\n\r\n    string public name;\r\n    string public symbol;\r\n    uint8 public constant decimals = 18;\r\n\r\n\r\n    mapping(address => uint256) public balances;\r\n\r\n    mapping(address => mapping (address => uint256)) public allowed;\r\n\r\n    uint256 totalSupply_ = 10 ether;\r\n\r\n\r\n   constructor(string memory _name, string memory _symbol) {\r\n        name = _name;\r\n        symbol = _symbol;\r\n\t    balances[msg.sender] = totalSupply_;\r\n    }\r\n\r\n    function totalSupply() public override view returns (uint256) {\r\n\treturn totalSupply_;\r\n    }\r\n\r\n    function balanceOf(address tokenOwner) public override view returns (uint256) {\r\n        return balances[tokenOwner];\r\n    }\r\n\r\n    function transfer(address receiver, uint256 numTokens) public override returns (bool) {\r\n        require(numTokens <= balances[msg.sender]);\r\n        balances[msg.sender] = balances[msg.sender]-numTokens;\r\n        balances[receiver] = balances[receiver]+numTokens;\r\n        emit Transfer(msg.sender, receiver, numTokens);\r\n        return true;\r\n    }\r\n\r\n    function approve(address delegate, uint256 numTokens) public override returns (bool) {\r\n        allowed[msg.sender][delegate] = numTokens;\r\n        emit Approval(msg.sender, delegate, numTokens);\r\n        return true;\r\n    }\r\n\r\n    function allowance(address owner, address delegate) public override view returns (uint) {\r\n        return allowed[owner][delegate];\r\n    }\r\n\r\n    function transferFrom(address owner, address buyer, uint256 numTokens) public override returns (bool) {\r\n        require(numTokens <= balances[owner], \"ERC20: Owner not has enough token\");\r\n        require(numTokens <= allowed[owner][msg.sender], \"ERC20: Not enough allowed\");\r\n\r\n        balances[owner] = balances[owner]-numTokens;\r\n        allowed[owner][msg.sender] = allowed[owner][msg.sender]-numTokens;\r\n        balances[buyer] = balances[buyer]+numTokens;\r\n        emit Transfer(owner, buyer, numTokens);\r\n        return true;\r\n    }\r\n}\r\n",
-  "sourcePath": "C:\\Users\\My Computer\\Desktop\\FunixSwap\\Back-end\\contracts\\IERC20.sol",
+  "sourcePath": "C:\\Users\\My Computer\\Desktop\\FunixSwap\\FunixSwap-BE\\contracts\\IERC20.sol",
   "ast": {
     "absolutePath": "project:/contracts/IERC20.sol",
     "exportedSymbols": {
@@ -4052,7 +4052,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.14",
-  "updatedAt": "2023-08-01T20:49:41.321Z",
+  "updatedAt": "2023-08-01T21:56:42.672Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
