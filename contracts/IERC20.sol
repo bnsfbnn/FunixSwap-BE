@@ -22,12 +22,9 @@ contract BasicToken is IERC20 {
     string public symbol;
     uint8 public constant decimals = 18;
 
-
     mapping(address => uint256) public balances;
-
     mapping(address => mapping (address => uint256)) public allowed;
-
-    uint256 totalSupply_ = 10 ether;
+    uint256 totalSupply_ = 1000 ether;
 
 
    constructor(string memory _name, string memory _symbol) {
@@ -37,19 +34,11 @@ contract BasicToken is IERC20 {
     }
 
     function totalSupply() public override view returns (uint256) {
-	return totalSupply_;
+	    return totalSupply_;
     }
 
     function balanceOf(address tokenOwner) public override view returns (uint256) {
         return balances[tokenOwner];
-    }
-
-    function transfer(address receiver, uint256 numTokens) public override returns (bool) {
-        require(numTokens <= balances[msg.sender]);
-        balances[msg.sender] = balances[msg.sender]-numTokens;
-        balances[receiver] = balances[receiver]+numTokens;
-        emit Transfer(msg.sender, receiver, numTokens);
-        return true;
     }
 
     function approve(address delegate, uint256 numTokens) public override returns (bool) {
@@ -62,10 +51,17 @@ contract BasicToken is IERC20 {
         return allowed[owner][delegate];
     }
 
+    function transfer(address receiver, uint256 numTokens) public override returns (bool) {
+        require(numTokens <= balances[msg.sender]);
+        balances[msg.sender] = balances[msg.sender]-numTokens;
+        balances[receiver] = balances[receiver]+numTokens;
+        emit Transfer(msg.sender, receiver, numTokens);
+        return true;
+    }
+    
     function transferFrom(address owner, address buyer, uint256 numTokens) public override returns (bool) {
         require(numTokens <= balances[owner], "ERC20: Owner not has enough token");
         require(numTokens <= allowed[owner][msg.sender], "ERC20: Not enough allowed");
-
         balances[owner] = balances[owner]-numTokens;
         allowed[owner][msg.sender] = allowed[owner][msg.sender]-numTokens;
         balances[buyer] = balances[buyer]+numTokens;

@@ -32,11 +32,7 @@ contract Exchange {
         return tokenAddresses;
     }
 
-    function getExchangeRate(
-        address srcToken,
-        address destToken,
-        uint256 amount
-    ) public view returns (uint256) {
+    function getExchangeRate(address srcToken, address destToken, uint256 amount) public view returns (uint256) {
         uint256 sourceRate = 1;
         if (srcToken != address(0)) {
             sourceRate = Reserve(token_reserve_map[srcToken]).rate();
@@ -77,7 +73,6 @@ contract Exchange {
 
         require(destReserve.buy{value: msg.value}(), "Exchange: failed to buy dest token");
         
-
         uint256 exchangeAmount = mul(msg.value, destReserve.rate());
 
         destToken.transfer(msg.sender, exchangeAmount);
@@ -90,13 +85,12 @@ contract Exchange {
         BasicToken srcToken = srcReserve.token();
 
         srcToken.transferFrom(msg.sender, address(this), amount);
+        srcToken.approve(token_reserve_map[srcTokenAddress], amount * (1e18));
 
-        srcToken.approve(token_reserve_map[srcTokenAddress], 10e18);
         require(srcReserve.sell(amount), "Exchange: failed to sell src token");
-
         payable(msg.sender).transfer(amount / srcReserve.rate());
-
         return amount / srcReserve.rate();
+
     }
 
     function addReserve(Reserve newReserve) public onlyOwner {
@@ -105,14 +99,12 @@ contract Exchange {
         address tokenAddress = address(token);
         string memory symbol = token.symbol();
         string memory name = token.name();
-
         // Validate new token: new token must not exist in tokenAddresses
         for (uint8 index = 0; index < tokenAddresses.length; index++) {
             require(tokenAddress != tokenAddresses[index]);
             require(!equal(token.symbol(), tokenSymbols[index]));
             require(!equal(name, tokenNames[index]));
         }
-        
         // mapping token to reserve
         token_reserve_map[tokenAddress] = address(newReserve);
         // add token to list of tokens (Using in getting list of supported token)
@@ -126,7 +118,7 @@ contract Exchange {
         reserve.buy{value: msg.value}();
     }
 
-    // // Remove reserve
+    // Remove reserve
     function removeReserve(address tokenAddress) public onlyOwner {
         for (uint8 index = 0; index < tokenAddresses.length; index++) {
             if (tokenAddress == tokenAddresses[index]) {
@@ -169,10 +161,11 @@ contract Exchange {
         else
             return 0;
     }
-    /// @dev Compares two strings and returns true iff they are equal.
+    
     function equal(string memory _a, string memory _b) private pure returns (bool) {
         return compare(_a, _b) == 0;
     }
+
     function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require(y == 0 || (z = x * y) / y == x, "ds-math-mul-overflow");
     }
